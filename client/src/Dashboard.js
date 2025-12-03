@@ -4,6 +4,7 @@ import axios from 'axios';
 import { BookOpen, Video, FileText, LogOut, Menu, X, PlayCircle, Clock } from 'lucide-react';
 import './Dashboard.css';
 import logoImg from './assets/logo.jpg'; 
+import { API_URL } from './config'; // Import config
 
 const Dashboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -29,7 +30,7 @@ const Dashboard = () => {
   // 3. Fetch Courses Function
   const fetchCourses = async () => {
     try {
-        const res = await axios.get("http://localhost:5000/api/courses");
+        const res = await axios.get(`${API_URL}/courses`);
         setCourses(res.data);
     } catch (err) {
         console.error("Error fetching courses:", err);
@@ -46,7 +47,7 @@ const Dashboard = () => {
   if (!user) return null;
 
   // Filter Courses Logic
-  // enrolledCourses might be an array of objects or strings depending on population, handled safely here
+  // Handles cases where enrolledCourses is array of strings OR objects
   const enrolledIds = (user.enrolledCourses || []).map(c => typeof c === 'object' ? c._id : c);
   
   const enrolledList = courses.filter(c => enrolledIds.includes(c._id));

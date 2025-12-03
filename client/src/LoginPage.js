@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios'; // Import Axios
+import axios from 'axios';
 import { Mail, Lock, User, ArrowRight, Loader } from 'lucide-react';
 import './LoginPage.css';
 import logoImg from './assets/logo.jpg'; 
+import { API_URL } from './config'; // Import the smart config
 
 const LoginPage = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -19,11 +20,10 @@ const LoginPage = () => {
   });
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.type]: e.target.value });
-    // Note: for name input, ensure name="name" or handle separately if type="text" conflicts
+    setFormData({ ...formData, [e.target.type === "text" ? "name" : e.target.type]: e.target.value });
   };
   
-  // specific handler for text input (Name)
+  // Specific handler for text input (Name) to avoid type conflict
   const handleNameChange = (e) => {
       setFormData({ ...formData, name: e.target.value });
   }
@@ -33,41 +33,38 @@ const LoginPage = () => {
     setError("");
     setLoading(true);
 
-    const API_URL = "http://localhost:5000/api/auth"; // Your Backend URL
-
     try {
-      if (isLogin) {
-        const res = await axios.post("http://localhost:5000/api/auth/login", {
-            email: formData.email,
-            password: formData.password
-        });
+        if (isLogin) {
+            // --- LOGIN LOGIC ---
+            const res = await axios.post(`${API_URL}/auth/login`, {
+                email: formData.email,
+                password: formData.password
+            });
 
-        // 1. Save User Data
-        localStorage.setItem("user", JSON.stringify(res.data));
-        localStorage.setItem("token", res.data.token);
+            // 1. Save Data to Browser
+            localStorage.setItem("user", JSON.stringify(res.data)); 
+            localStorage.setItem("token", res.data.token); 
 
-        // 2. ROLE BASED REDIRECT
-        // If the backend says role is 'admin', go to admin panel
-        if (res.data.role === 'admin') {
-            navigate('/admin');
+            // 2. Check Role & Redirect
+            if (res.data.role === 'admin') {
+                navigate('/admin');
+            } else {
+                navigate('/dashboard');
+            }
+
         } else {
-            navigate('/dashboard');
-        }
-    } else {
             // --- REGISTER LOGIC ---
-            await axios.post(`${API_URL}/register`, {
+            await axios.post(`${API_URL}/auth/register`, {
                 name: formData.name,
                 email: formData.email,
                 password: formData.password
             });
             
-            // On success, switch to login view
             alert("Account created! Please log in.");
-            setIsLogin(true);
+            setIsLogin(true); // Switch to login view
         }
     } catch (err) {
-        // Handle Errors (e.g., Wrong password, User already exists)
-        setError(err.response?.data?.message || "Something went wrong");
+        setError(err.response?.data?.message || "Connection failed. Please check backend.");
     } finally {
         setLoading(false);
     }
@@ -82,7 +79,7 @@ const LoginPage = () => {
             <p>{isLogin ? 'Please enter your details.' : 'Join Tution Mater today.'}</p>
         </div>
 
-        {error && <div style={{color: '#ef4444', marginBottom: '15px', textAlign: 'center', background: 'rgba(239, 68, 68, 0.1)', padding: '10px', borderRadius: '5px'}}>{error}</div>}
+        {error && <div style={{color: '#ef4444', marginBottom: '15px', textAlign: 'center', background: 'rgba(239, 68, 68, 0.1)', padding: '10px', borderRadius: '5px', fontSize: '0.9rem'}}>{error}</div>}
 
         <form onSubmit={handleSubmit}>
             {!isLogin && (
