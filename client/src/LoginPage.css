@@ -19,3 +19,6 @@
 .link-btn:hover { text-decoration: underline; }
 .forgot-btn { display: block; margin: 15px auto 0; background: none; border: none; color: #64748b; cursor: pointer; font-size: 0.85rem; }
 .forgot-btn:hover { color: #94a3b8; }
+
+.spin { animation: spin 1s linear infinite; }
+@keyframes spin { 100% { transform: rotate(360deg); } }

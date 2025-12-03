@@ -1,130 +1,121 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom'; // Link is imported here
-import { BookOpen, Video, FileText, LogOut, Menu, X, PlayCircle, Clock } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { BookOpen, Video, FileText, LogOut, Menu, X, PlayCircle, Lock } from 'lucide-react';
 import './Dashboard.css';
 import logoImg from './assets/logo.jpg'; 
 
 const Dashboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [courses, setCourses] = useState([]);
+  const navigate = useNavigate();
+  const user = JSON.parse(localStorage.getItem("user"));
 
-  // Dummy Data
-  const myCourses = [
-    { id: 1, title: "SEE Bridge Course 2025", progress: 65, nextLesson: "Force & Motion - Part 2" },
-    { id: 2, title: "Class 11 Physics (Mechanics)", progress: 30, nextLesson: "Vectors & Scalars" },
-  ];
+  useEffect(() => {
+    if (!user) {
+        navigate('/login');
+    } else {
+        fetchCourses();
+    }
+  }, [user, navigate]);
+
+  const fetchCourses = async () => {
+    try {
+        const res = await axios.get("http://localhost:5000/api/courses");
+        setCourses(res.data);
+    } catch (err) {
+        console.error(err);
+    }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    localStorage.removeItem("token");
+    navigate('/login');
+  };
+
+  if (!user) return null;
+
+  // Filter Courses
+  const enrolledCourseIds = user.enrolledCourses || []; // Array of IDs
+  const enrolledList = courses.filter(c => enrolledCourseIds.includes(c._id));
+  const availableList = courses.filter(c => !enrolledCourseIds.includes(c._id));
 
   return (
     <div className="dashboard-container">
-      {/* --- SIDEBAR --- */}
+      {/* Sidebar (Same as before) */}
       <aside className={`sidebar ${isSidebarOpen ? 'open' : ''}`}>
         <div className="sidebar-header">
             <img src={logoImg} alt="Logo" className="dash-logo" />
             <span className="dash-brand">Tution Mater</span>
-            <button className="close-sidebar-btn" onClick={() => setIsSidebarOpen(false)}>
-                <X size={24} />
-            </button>
+            <button className="close-sidebar-btn" onClick={() => setIsSidebarOpen(false)}><X size={24}/></button>
         </div>
-
-        {/* FIXED NAVIGATION SECTION */}
         <nav className="sidebar-nav">
-            {/* Replaced <a> with <Link> to fix ESLint warnings */}
-            <Link to="/dashboard" className="nav-item active">
-                <BookOpen size={20}/> My Courses
-            </Link>
-            <Link to="/batches" className="nav-item">
-                <Video size={20}/> Live Classes
-            </Link>
-            <Link to="/notes" className="nav-item">
-                <FileText size={20}/> Notes & PDF
-            </Link>
+             <Link to="/dashboard" className="nav-item active"><BookOpen size={20}/> My Courses</Link>
+             <button onClick={handleLogout} className="logout-btn-styled"><LogOut size={20} /> Logout</button>
         </nav>
-
-        <div className="sidebar-footer">
-            <Link to="/" className="logout-btn">
-                <LogOut size={20} /> Logout
-            </Link>
-        </div>
       </aside>
 
-      {/* --- MAIN CONTENT --- */}
       <main className="main-content">
-        {/* Top Header */}
         <header className="dash-header">
-            <button className="menu-btn" onClick={() => setIsSidebarOpen(true)}>
-                <Menu size={24} color="white" />
-            </button>
+            <button className="menu-btn" onClick={() => setIsSidebarOpen(true)}><Menu size={24} color="white"/></button>
             <h2>My Dashboard</h2>
             <div className="user-profile">
-                <div className="avatar">S</div>
-                <span className="username">Student Name</span>
+                <div className="avatar">{user.name.charAt(0).toUpperCase()}</div>
+                <span className="username">{user.name}</span>
             </div>
         </header>
 
-        {/* Welcome Section */}
-        <div className="welcome-banner">
-            <h1>Welcome back, Student! 👋</h1>
-            <p>You have 2 lessons pending today.</p>
-        </div>
-
-        {/* My Courses Grid */}
+        {/* --- SECTION 1: ENROLLED COURSES --- */}
         <section className="my-courses">
-            <h3>Enrolled Courses</h3>
+            <h3>My Learning (Purchased)</h3>
             <div className="dash-grid">
-                {myCourses.map((course) => (
-                    <div key={course.id} className="dash-card">
+                {enrolledList.length === 0 && <p className="no-data">You haven't enrolled in any courses yet.</p>}
+                
+                {enrolledList.map((course) => (
+                    <div key={course._id} className="dash-card enrolled">
                         <div className="card-top">
                             <h4>{course.title}</h4>
-                            <div className="progress-badge">{course.progress}% Completed</div>
+                            <div className="progress-badge">Active</div>
                         </div>
-                        
                         <div className="progress-bar-bg">
-                            <div className="progress-bar-fill" style={{width: `${course.progress}%`}}></div>
+                            <div className="progress-bar-fill" style={{width: `10%`}}></div>
                         </div>
-
-                        <div className="next-up">
-                            <small>Next Lesson:</small>
-                            <div className="lesson-row">
-                                <PlayCircle size={16} color="#3b82f6" />
-                                <span>{course.nextLesson}</span>
-                            </div>
-                        </div>
-                        <br></br>
-                        <Link to={`/classroom/${course.id}`} className="continue-btn">
-    Continue Learning
-</Link>
+                        <Link to={`/classroom/${course._id}`} className="continue-btn">
+                            <PlayCircle size={18} /> Continue Learning
+                        </Link>
                     </div>
                 ))}
-
-                {/* Upsell Card */}
-                <div className="dash-card add-new">
-                    <div className="add-icon">+</div>
-                    <h4>Enroll in New Course</h4>
-                    <p>Browse our catalog</p>
-                    <Link to="/batches" className="browse-link">Browse All</Link>
-                </div>
             </div>
         </section>
 
-        {/* Recent Activity / Stats */}
-        <section className="stats-row">
-            <div className="stat-box">
-                <Clock size={24} color="#3b82f6" />
-                <div>
-                    <h4>12.5 Hrs</h4>
-                    <p>Watch Time</p>
-                </div>
-            </div>
-            <div className="stat-box">
-                <FileText size={24} color="#3b82f6" />
-                <div>
-                    <h4>5</h4>
-                    <p>Notes Downloaded</p>
-                </div>
+        {/* --- SECTION 2: AVAILABLE COURSES --- */}
+        <section className="my-courses" style={{marginTop: '40px'}}>
+            <h3>Explore New Batches</h3>
+            <div className="dash-grid">
+                {availableList.length === 0 && <p className="no-data">No new batches available.</p>}
+
+                {availableList.map((course) => (
+                    <div key={course._id} className="dash-card available">
+                        <div className="card-top">
+                            <h4>{course.title}</h4>
+                            <div className="progress-badge new">New</div>
+                        </div>
+                        <p style={{color:'#94a3b8', fontSize:'0.9rem', marginBottom:'15px'}}>
+                            {course.description.substring(0,60)}...
+                        </p>
+                        <div className="price-tag">Rs. {course.price}</div>
+                        
+                        {/* Go to Payment Page */}
+                        <Link to={`/payment/${course._id}`} className="continue-btn buy-btn">
+                            Enroll Now
+                        </Link>
+                    </div>
+                ))}
             </div>
         </section>
       </main>
       
-      {/* Overlay for mobile sidebar */}
       {isSidebarOpen && <div className="overlay" onClick={() => setIsSidebarOpen(false)}></div>}
     </div>
   );

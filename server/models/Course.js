@@ -2,15 +2,17 @@ const mongoose = require('mongoose');
 
 const CourseSchema = new mongoose.Schema({
   title: { type: String, required: true },
-  description: { type: String },
-  price: { type: Number, required: true },
-  thumbnail: { type: String }, // We will store the Image URL
-  category: { type: String },
-  teacher: { type: String, default: "Tution Mater" },
-  videos: [{
+  description: String,
+  price: Number,
+  category: String,
+  thumbnail: String,
+  // New Content Fields
+  notesLink: { type: String }, // URL to PDF drive/S3
+  homeworkLink: { type: String }, // URL to assignments
+  lectures: [{
     title: String,
     videoUrl: String,
-    isFree: { type: Boolean, default: false } // For Demo videos
+    isLocked: { type: Boolean, default: true }
   }]
 }, { timestamps: true });
 

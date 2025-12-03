@@ -1,4 +1,6 @@
 const authRoutes = require('./routes/auth');
+const courseRoute = require('./routes/courses');
+const userRoute = require('./routes/users');
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -23,6 +25,8 @@ app.get('/', (req, res) => {
   res.send('Tution Mater API is Running...');
 });
 app.use('/api/auth', authRoutes);
+app.use('/api/courses', courseRoute);
+app.use('/api/users', userRoute);
 
 // START SERVER
 const PORT = process.env.PORT || 5000;

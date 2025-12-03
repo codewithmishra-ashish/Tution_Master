@@ -7,20 +7,22 @@ import VideoPlayerPage from './VideoPlayerPage';
 import AdminDashboard from './AdminDashboard'; // Import
 import CreateBatch from './CreateBatch'; // Import
 import ProfilePage from './ProfilePage'; // Import
+// ... imports
+import PaymentPage from './PaymentPage'; // Import
 
 function App() {
   return (
     <Router>
       <Routes>
-        {/* Public Routes */}
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />
         
         {/* Student Routes */}
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/payment/:courseId" element={<PaymentPage />} />  {/* Add this */}
         <Route path="/classroom/:courseId" element={<VideoPlayerPage />} />
 
-        {/* Admin/Teacher Routes */}
+        {/* Admin Routes */}
         <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/admin/create-batch" element={<CreateBatch />} />
         <Route path="/profile" element={<ProfilePage />} />
@@ -28,5 +30,4 @@ function App() {
     </Router>
   );
 }
-
 export default App;
