@@ -2,13 +2,16 @@ const mongoose = require('mongoose');
 
 const CourseSchema = new mongoose.Schema({
   title: { type: String, required: true },
-  description: String,
-  price: Number,
-  category: String,
-  thumbnail: String,
-  // New Content Fields
-  notesLink: { type: String }, // URL to PDF drive/S3
-  homeworkLink: { type: String }, // URL to assignments
+  description: { type: String },
+  price: { type: Number, required: true },
+  category: { type: String },
+  thumbnail: { type: String },
+  
+  // Content Links
+  notesLink: { type: String }, 
+  homeworkLink: { type: String },
+  
+  // For Classroom
   lectures: [{
     title: String,
     videoUrl: String,

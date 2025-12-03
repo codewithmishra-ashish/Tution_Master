@@ -1,33 +1,37 @@
-const authRoutes = require('./routes/auth');
-const courseRoute = require('./routes/courses');
-const userRoute = require('./routes/users');
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
 
-// Load config
+// Load environment variables
 dotenv.config();
 
 const app = express();
 
-// Middleware (Allows us to read JSON and talk to React)
+// Middleware (Allows JSON data and Cross-Origin requests)
 app.use(express.json());
 app.use(cors());
 
-// Database Connection
+// --- DATABASE CONNECTION ---
+// If MONGO_URI is missing, it will crash, so check your .env file!
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('✅ MongoDB Connected Successfully'))
   .catch((err) => console.log('❌ MongoDB Connection Error:', err));
 
-// Basic Route (To test if server works)
+// --- ROUTES ---
+const authRoute = require('./routes/auth');
+const courseRoute = require('./routes/courses');
+const userRoute = require('./routes/users');
+
+app.use('/api/auth', authRoute);
+app.use('/api/courses', courseRoute); // <--- THIS LINE IS CRITICAL FOR COURSES
+app.use('/api/users', userRoute);
+
+// Basic Route
 app.get('/', (req, res) => {
   res.send('Tution Mater API is Running...');
 });
-app.use('/api/auth', authRoutes);
-app.use('/api/courses', courseRoute);
-app.use('/api/users', userRoute);
 
-// START SERVER
+// --- START SERVER ---
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));

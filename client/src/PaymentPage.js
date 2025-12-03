@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
-import { ArrowLeft, CheckCircle, Lock, ShieldCheck } from 'lucide-react';
+import { ArrowLeft, Lock, ShieldCheck } from 'lucide-react';
 import './PaymentPage.css'; // We will create this
 
 const PaymentPage = () => {

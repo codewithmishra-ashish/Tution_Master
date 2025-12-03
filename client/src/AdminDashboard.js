@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios'; 
-import { LayoutDashboard, PlusCircle, Users, Settings, LogOut, DollarSign, BookOpen, Edit, Trash2 } from 'lucide-react';
+import { LayoutDashboard, PlusCircle, Users, Settings, LogOut, DollarSign, BookOpen, Edit, Trash2, FileText } from 'lucide-react';
 import './Dashboard.css'; // Reusing Dashboard styles
 import logoImg from './assets/logo.jpg'; 
 
@@ -13,7 +13,7 @@ const AdminDashboard = () => {
   // Dashboard Stats State
   const [stats, setStats] = useState({
     revenue: 0,
-    students: 1250, // Dummy value for now
+    students: 1250, // Dummy value until we fetch real users
     activeBatches: 0
   });
 
@@ -34,7 +34,8 @@ const AdminDashboard = () => {
             setRealBatches(batches);
 
             // Calculate simple stats based on real data
-            const totalRevenue = batches.reduce((acc, curr) => acc + (curr.price * 10), 0); // Assuming 10 students per batch for demo
+            // Assuming average of 10 students per batch for demo revenue calculation
+            const totalRevenue = batches.reduce((acc, curr) => acc + (curr.price * 10), 0); 
             
             setStats(prev => ({
                 ...prev,
@@ -154,8 +155,11 @@ const AdminDashboard = () => {
                                     </td>
                                     <td>
                                         <div className="action-buttons">
-                                            <button className="icon-btn edit" title="Edit"><Edit size={16}/></button>
-                                            <button className="icon-btn delete" title="Delete"><Trash2 size={16}/></button>
+                                            <button className="icon-btn edit" title="Edit Course"><Edit size={16}/></button>
+                                            <button className="icon-btn" title="Upload Notes" style={{color:'#f59e0b'}}>
+                                                <FileText size={16}/>
+                                            </button>
+                                            <button className="icon-btn delete" title="Delete Course"><Trash2 size={16}/></button>
                                         </div>
                                     </td>
                                 </tr>
