@@ -22,10 +22,10 @@ const LandingPage = () => {
             <img src={logoImg} alt="Logo" className="site-logo-img" />
             <h1 className="site-logo-text">
               <span className="highlight-letter">T</span>ution 
-              <span className="highlight-letter"> M</span>ater
+              <span className="highlight-letter"> M</span>aster
             </h1>
         </div>
-
+        
         {/* Desktop Links */}
         <div className="nav-links desktop-links">
           <Link to="/">Home</Link>
